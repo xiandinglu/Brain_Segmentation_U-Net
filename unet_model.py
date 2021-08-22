@@ -50,7 +50,7 @@ def dice_coef(y_true, y_pred):
 def dice_coef_loss(y_true, y_pred):
     return 1-dice_coef(y_true, y_pred)
 
-def unet_model():
+def unet():
     inputs = Input((1, img_size, img_size))
     conv1 = Conv2D(64, (3, 3), activation='relu', padding='same', kernel_regularizer=l2(0.01)) (inputs)
     batch1 = BatchNormalization(axis=1)(conv1)

@@ -8,7 +8,7 @@ import os
 # import skimage.transform as trans
 # import random as r
 import numpy as np
-from model import unet_model
+from unet_model import unet
 import matplotlib.pyplot as plt
 
 # Load the dataset as npy format.
@@ -19,7 +19,7 @@ print("Dataset loaded")
 print(train_X.shape)
 print(train_Y.shape)
 
-model = unet_model()
+model = unet()
 
 # history = model.fit(X_train, seg, validation_split=0.25, batch_size=5, epochs= 10, shuffle=True,  verbose=1,)
 history = model.fit(train_X, train_Y, validation_split=0.25, batch_size=5, epochs= 2, shuffle=True,  verbose=1,)
