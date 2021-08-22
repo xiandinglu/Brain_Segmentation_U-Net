@@ -9,7 +9,7 @@ img_size = 120
 num_of_aug = 1
 
 # read the brain images for training.
-def load_dataset(src, mask, label=False, resize=(155,img_size,img_size)):
+def load_dataset(src, mask, label=False, resize=(155,img_size,img_size),target_path=''):
     files = glob.glob(src + mask, recursive=True)
     imgs = []
     # counter = 0
@@ -33,7 +33,7 @@ def load_dataset(src, mask, label=False, resize=(155,img_size,img_size)):
             img_g = aug(img_t,num_of_aug)
             for n in range(img_g.shape[0]):
                 imgs.append(img_g[n,:,:,:])
-    name = 'y_'+ str(img_size) if label else 'x_'+ str(img_size)
+    name = target_path + 'y_'+ str(img_size) if label else target_path + 'x_'+ str(img_size)
     np.save(name, np.array(imgs).astype('float32'))
     print('Saved', len(files), 'to', name)
 
@@ -59,12 +59,13 @@ def aug(scans,n):          #input img must be rank 4
     return img_g
 
 
-def data_augmenatation(source_path):
+def data_augmenatation(source_path, target_path):
     # Only LGG
     ## Y - Mask Annotation
-    load_dataset(source_path, '**/*_seg.nii.gz', label=True, resize=(155,img_size,img_size))
+    load_dataset(source_path, '**/*_seg.nii.gz', label=True, resize=(155,img_size,img_size), target_path=target_path)
     ## X - Features
-    load_dataset(source_path, '**/*_flair.nii.gz',label=False, resize=(155,img_size,img_size))
+    load_dataset(source_path, '**/*_flair.nii.gz',label=False, resize=(155,img_size,img_size), target_path=target_path)
 
 # Comment the line if you load the dataset.
-data_augmenatation("C:/Users/MACHENIKE/Desktop/MDS/Research Project/Data/TestingSubData//")
+data_augmenatation("C:/Users/MACHENIKE/Desktop/MDS/Research Project/Data/TestingSubData//",
+                   "C:/Users/MACHENIKE/Desktop/MDS/Research Project/Data/")
