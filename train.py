@@ -11,6 +11,8 @@ import numpy as np
 from unet_model import unet
 import matplotlib.pyplot as plt
 
+img_size = 120
+
 # Load the dataset as npy format.
 print("Loading dataset.")
 train_X = np.load('x_{}.npy'.format(img_size))
@@ -22,7 +24,7 @@ print(train_Y.shape)
 model = unet()
 
 # history = model.fit(X_train, seg, validation_split=0.25, batch_size=5, epochs= 10, shuffle=True,  verbose=1,)
-history = model.fit(train_X, train_Y, validation_split=0.25, batch_size=5, epochs= 2, shuffle=True,  verbose=1,)
+history = model.fit(train_X, train_Y, validation_split=0.25, batch_size=5, epochs= 5, shuffle=True,  verbose=1,)
 
 # Plot training & validation accuracy values
 
@@ -40,7 +42,7 @@ plt.plot(history.history['val_loss'])
 plt.title('model loss')
 plt.ylabel('loss')
 plt.xlabel('epoch')
-plt.legend(['train', 'test'], loc='upper left')
+plt.legend(['train', 'validation'], loc='upper left')
 plt.savefig('dice_loss.png')
 
 

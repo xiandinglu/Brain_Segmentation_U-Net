@@ -68,4 +68,4 @@ def data_augmenatation(source_path, target_path):
 
 # Comment the line if you load the dataset.
 data_augmenatation("C:/Users/MACHENIKE/Desktop/MDS/Research Project/Data/TestingSubData//",
-                   "C:/Users/MACHENIKE/Desktop/MDS/Research Project/Data/")
+                   "")
