@@ -21,10 +21,74 @@ print("Dataset loaded")
 print(train_X.shape)
 print(train_Y.shape)
 
+def seg_to_array(path, end, label):
+    # get location
+    files = glob(path + end, recursive=True)
+
+    img_list = []
+
+    r.seed(42)
+    r.shuffle(files)
+
+    for file in files:
+        img = io.imread(file, plugin="simpleitk")
+
+        # all tumor
+        if label == 1:
+            img[img != 0] = 1
+
+        # Non-enhancing tumor
+        if label == 2:
+            img[img != 1] = 0
+
+        # Without Edema
+        if label == 3:
+            img[img == 2] = 0
+            img[img != 0] = 1
+
+        # Enhancing tumor
+        if label == 4:
+            img[img != 4] = 0
+            img[img == 4] = 1
+
+        img.astype("float32")
+
+        for slice in range(60, 130):
+            img_s = img[slice, :, :]
+            img_s = np.expand_dims(img_s, axis=0)
+            img_list.append(img_s)
+    return np.array(img_list)
+
+
+def to_array(path, end):
+    # get location
+    files = glob(path + end, recursive=True)
+
+    img_list = []
+
+    r.seed(42)
+    r.shuffle(files)
+
+    for file in files:
+        img = io.imread(file, plugin="simpleitk")
+        # standardization
+        img = ((img - img.mean()) / (img.std()))
+        img.astype("float32")
+
+        for slice in range(60, 130):
+            img_s = img[slice, :, :]
+            img_s = np.expand_dims(img_s, axis=0)
+            img_list.append(img_s)
+    return np.array(img_list)
+
+path = r"C:\Users\MACHENIKE\Desktop\MDS\Research Project\Data\GzipData\\"
+train_X = to_array(path=path, end="**/*flair.nii.gz")
+train_Y = seg_to_array(path=path, end="**/*seg.nii.gz", label=1)
+
 model = unet()
 
 # history = model.fit(X_train, seg, validation_split=0.25, batch_size=5, epochs= 10, shuffle=True,  verbose=1,)
-history = model.fit(train_X, train_Y, validation_split=0.25, batch_size=5, epochs= 5, shuffle=True,  verbose=1,)
+history = model.fit(train_X, train_Y, validation_split=0.25, batch_size=5, epochs= 1, shuffle=True,  verbose=1,)
 
 # Plot training & validation accuracy values
 
