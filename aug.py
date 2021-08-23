@@ -12,13 +12,13 @@ num_of_aug = 1
 def load_dataset(src, mask, label=False, resize=(155,img_size,img_size),target_path=''):
     files = glob.glob(src + mask, recursive=True)
     imgs = []
-    # counter = 0
+    counter = 0
     print('Processing---', mask)
     for file in files:
-        # counter +=1
-        # if counter == 81:
-        #     break
-        # print(counter, ". adim")
+        counter +=1
+        if counter == 81:
+            break
+        print(counter, ". adim")
         img = io.imread(file, plugin='simpleitk')
         img = trans.resize(img, resize, mode='constant')
         if label:
