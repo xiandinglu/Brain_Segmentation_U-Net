@@ -3,27 +3,28 @@ import os
 # import tensorflow as tf
 # physical_devices = tf.config.list_physical_devices('GPU')
 # tf.config.experimental.set_memory_growth(physical_devices[0], True)
-# from glob import glob
-# from skimage import data, io, filters
-# import skimage.transform as trans
-# import random as r
+from glob import glob
+from skimage import data, io, filters
+import skimage.transform as trans
+import random as r
 import numpy as np
 from unet_model import unet
 import matplotlib.pyplot as plt
 
 img_size = 120
 
-# Load the dataset as npy format.
-print("Loading dataset.")
-train_X = np.load('x_{}.npy'.format(img_size))
-train_Y = np.load('y_{}.npy'.format(img_size))
-print("Dataset loaded")
-print(train_X.shape)
-print(train_Y.shape)
+# # Load the dataset as npy format.
+# print("Loading dataset.")
+# train_X = np.load('x_{}.npy'.format(img_size))
+# train_Y = np.load('y_{}.npy'.format(img_size))
+# print("Dataset loaded")
+# print(train_X.shape)
+# print(train_Y.shape)
 
-def seg_to_array(path, end, label):
+def seg_to_array(files, label, resize=(155,img_size,img_size)):
+    # def seg_to_array(path, end, label, resize=(155, img_size, img_size)):
     # get location
-    files = glob(path + end, recursive=True)
+    # files = glob(path + end, recursive=True)
 
     img_list = []
 
@@ -32,6 +33,7 @@ def seg_to_array(path, end, label):
 
     for file in files:
         img = io.imread(file, plugin="simpleitk")
+        img = trans.resize(img, resize, mode='constant')
 
         # all tumor
         if label == 1:
@@ -60,9 +62,10 @@ def seg_to_array(path, end, label):
     return np.array(img_list)
 
 
-def to_array(path, end):
+def to_array(files, resize=(155,img_size,img_size)):
+    # def to_array(path, end, resize=(155, img_size, img_size)):
     # get location
-    files = glob(path + end, recursive=True)
+    # files = glob(path + end, recursive=True)
 
     img_list = []
 
@@ -71,6 +74,7 @@ def to_array(path, end):
 
     for file in files:
         img = io.imread(file, plugin="simpleitk")
+        img = trans.resize(img, resize, mode='constant')
         # standardization
         img = ((img - img.mean()) / (img.std()))
         img.astype("float32")
@@ -81,9 +85,30 @@ def to_array(path, end):
             img_list.append(img_s)
     return np.array(img_list)
 
+def get_path(path, end, train=0.6, test=0.2):
+    files_json = {}
+    files = glob(path + end, recursive=True)
+
+    r.seed(10)
+    r.shuffle(files)
+
+    train_n = int(len(files)*train)
+    test_n = int(len(files)*test)
+    valid_n = len(files) - train_n - test_n
+    files_json['train'] = files[:train_n - 1]
+    files_json['valid'] = files[train_n:valid_n - 1]
+    files_json['test'] = files[valid_n:]
+    return files_json
+
 path = r"C:\Users\MACHENIKE\Desktop\MDS\Research Project\Data\GzipData\\"
-train_X = to_array(path=path, end="**/*flair.nii.gz")
-train_Y = seg_to_array(path=path, end="**/*seg.nii.gz", label=1)
+
+X_files = get_path(path=path, end="**/*flair.nii.gz")
+Y_files = get_path(path=path, end="**/*seg.nii.gz")
+# train_X = to_array(path=path, end="**/*flair.nii.gz")
+# train_Y = seg_to_array(path=path, end="**/*seg.nii.gz", label=1)
+
+print(X_files)
+print(Y_files)
 
 model = unet()
 
